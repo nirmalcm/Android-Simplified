@@ -1,1 +1,155 @@
-RECYCLER VIEW
+                                                   RECYCLER VIEW
+______________________________________________________________________________________________________________
+
+private RecyclerView mRecyclerView;
+private RecyclerViewAdapter mRecyclerViewAdapter;
+private void initRecyclerView(){
+
+    mRecyclerView = findViewById(R.id.id_recycler_view);
+
+    final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+    mRecyclerView.setLayoutManager(linearLayoutManager);
+
+    mRecyclerViewAdapter = new RecyclerViewAdapter(this, getRecyclerViewModels());
+    mRecyclerViewAdapter.notifyDataSetChanged();
+
+    mRecyclerView.setAdapter(mRecyclerViewAdapter);
+    mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+    mRecyclerView.setNestedScrollingEnabled(false);
+
+    mRecyclerViewAdapter.setOnItemClickListener((view, pos) -> {
+    });
+}
+
+private List<RecyclerViewModel> getRecyclerViewModels() {
+    return Arrays.asList(new RecyclerViewModel("1"),new RecyclerViewModel("2"));
+}
+
+
+______________________________________________________________________________________________________________
+
+public class RecyclerViewAdapter extends RecyclerView.Adapter
+{
+    private List<RecyclerViewModel> recylerViewModels;
+    private Context context;
+
+    public RecyclerViewAdapter(Context context, List<RecyclerViewModel> recylerViewModels)
+    {
+        this.recylerViewModels = recylerViewModels;
+        this.context = context;
+    }
+
+    public OnItemClickListener onItemClickListener;
+    public interface OnItemClickListener {
+        void onItemClick(View view, int pos);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    {
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_adapter, parent, false);
+        return new ViewHolderSub(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position)
+    {
+        final ViewHolderSub viewHolderSub = (ViewHolderSub) holder;
+
+
+        viewHolderSub.id.setTag(viewHolderSub.id.getId(), recylerViewModels.get(position));
+        viewHolderSub.id.setText(recylerViewModels.get(position).getId());
+
+        viewHolderSub.itemView.setTag(viewHolderSub.itemView.getId(), recylerViewModels.get(position));
+        viewHolderSub.itemView.setOnClickListener(v -> {
+            onItemClickListener.onItemClick(v,position);
+        });
+    }
+
+    @Override
+    public int getItemCount()
+    {
+        return recylerViewModels.size();
+    }
+
+    public class ViewHolderSub extends RecyclerView.ViewHolder
+    {
+        TextView id;
+
+        public ViewHolderSub(View itemView)
+        {
+            super(itemView);
+            id = itemView.findViewById(R.id.id_name);
+        }
+    }
+}
+
+______________________________________________________________________________________________________________
+
+public class RecyclerViewModel {
+
+    private String id;
+
+    RecyclerViewModel(String id){
+        this.id=id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+}
+
+______________________________________________________________________________________________________________
+
+<androidx.recyclerview.widget.RecyclerView
+            android:layout_marginTop="20dp"
+            tools:listitem="@layout/recyclerview_adapter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/id_recycler_view"/>
+
+______________________________________________________________________________________________________________
+
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    android:layout_width="match_parent"
+    android:layout_height="45dp"
+    android:visibility="visible"
+    app:cardCornerRadius="10dp"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
+    app:cardElevation="0dp"
+    android:clickable="true"
+    android:foreground="?attr/selectableItemBackgroundBorderless"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/id_name"
+            android:elevation="20dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"/>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
+______________________________________________________________________________________________________________
